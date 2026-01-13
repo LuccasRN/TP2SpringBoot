@@ -31,3 +31,24 @@ INSERT INTO MEDICAMENT (NOM, CATEGORIE_CODE, QUANTITE_PAR_UNITE, PRIX_UNITAIRE, 
 INSERT INTO MEDICAMENT (NOM, CATEGORIE_CODE, QUANTITE_PAR_UNITE, PRIX_UNITAIRE, UNITES_EN_STOCK, UNITES_COMMANDEES, NIVEAU_DE_REAPPRO, INDISPONIBLE, imageURL) VALUES
 ('Lévofloxacine 500mg', 3, 'Boîte de 7 comprimés', 15.80, 160, 0, 18, true, 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=400'),
 ('Clindamycine 300mg', 3, 'Boîte de 16 gélules', 13.20, 140, 0, 16, true, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400');
+
+-- Insertion d'un Dispensaire
+INSERT INTO dispensaire (code, nom, contact, fonction, telephone, fax, adresse, ville, region, code_postal, pays) 
+VALUES ('DIS01', 'Dispensaire Central', 'Dr. Smith', 'Directeur', '0102030405', '0102030406', '12 Rue de la Santé', 'Castres', 'Occitanie', '81100', 'France');
+
+INSERT INTO dispensaire (code, nom, contact, fonction, telephone, fax, adresse, ville, region, code_postal, pays) 
+VALUES ('DIS02', 'Dispensaire Sud', 'Mme. Dupont', 'Gérante', '0504030201', NULL, '45 Av des Pyrénées', 'Toulouse', 'Occitanie', '31000', 'France');
+
+-- Insertion de Commandes
+-- Note: Assurez-vous que les dates correspondent au format attendu par H2 ou configurez Hibernate
+INSERT INTO commande (saisie_le, envoyee_le, port, destinataire, remise, dispensaire_code, adresse, ville, region, code_postal, pays)
+VALUES ('2025-01-10', '2025-01-12', 15.50, 'M. Martin', 0.00, 'DIS01', '12 Rue de la Santé', 'Castres', 'Occitanie', '81100', 'France');
+
+INSERT INTO commande (saisie_le, envoyee_le, port, destinataire, remise, dispensaire_code, adresse, ville, region, code_postal, pays)
+VALUES ('2023-05-20', '2023-05-21', 10.00, 'Mme. Durand', 5.00, 'DIS02', '45 Av des Pyrénées', 'Toulouse', 'Occitanie', '31000', 'France');
+
+-- Insertion de Lignes (Assurez-vous que le MEDICAMENT avec ID 1 existe déjà dans le data.sql fourni par le prof)
+-- On suppose que '1' est l'ID de la première commande générée ci-dessus
+INSERT INTO ligne (quantite, commande_numero, medicament_reference) VALUES (10, 1, 1);
+INSERT INTO ligne (quantite, commande_numero, medicament_reference) VALUES (5, 1, 2);
+INSERT INTO ligne (quantite, commande_numero, medicament_reference) VALUES (20, 2, 3);

@@ -3,12 +3,14 @@ package pharmacie.dao;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
 import pharmacie.entity.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -18,6 +20,10 @@ public class RepositoryCustomMethodsTest {
     private CategorieRepository categorieRepository;
     @Autowired
     private MedicamentRepository medicamentRepository;
+    @Autowired
+    private CommandeRepository commandeRepository;
+    @Autowired
+    private DispensaireRepository dispensaireRepository;    
 
 
     @Test // Ce test se base uniquement sur les données définies dans data.sql
@@ -53,6 +59,35 @@ public class RepositoryCustomMethodsTest {
         assertEquals(2, list.size());
         assertTrue(list.stream().anyMatch(cat -> cat.getLibelle().equals("AntibiotiquesTest")));
         assertTrue(list.stream().anyMatch(cat -> cat.getLibelle().equals("AnalgesiquesTest")));
+    }
+
+    @Test
+    void testFindCommandesAfterDate() {
+        // Given (Données chargées via data.sql : une commande le 2025-01-10 et une le 2023-05-20)
+        LocalDate datePivot = LocalDate.of(2024, 1, 1);
+
+        // When
+        List<Commande> results = commandeRepository.findBySaisieLeAfter(datePivot);
+
+        // Then
+        assertThat(results).isNotEmpty();
+        // On s'attend à trouver celle de 2025, mais pas celle de 2023
+        assertThat(results).anyMatch(c -> c.getSaisieLe().isAfter(datePivot));
+        assertThat(results).noneMatch(c -> c.getSaisieLe().isBefore(datePivot));
+    }
+
+    @Test
+    void testFindDispensairesByRegion() {
+        // Given (Données chargées via data.sql : Occitanie)
+        String regionRecherchee = "Occitanie";
+
+        // When
+        List<Dispensaire> results = dispensaireRepository.findByAdresseRegion(regionRecherchee);
+
+        // Then
+        assertThat(results).isNotEmpty();
+        assertThat(results.size()).isGreaterThanOrEqualTo(2); // Nous avons inséré 2 dispensaires en Occitanie
+        assertThat(results.get(0).getAdresse().getRegion()).isEqualTo(regionRecherchee);
     }
 
 
