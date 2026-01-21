@@ -11,4 +11,5 @@ public interface CommandeRepository extends JpaRepository<Commande, Integer> {
 
     // Trouver toutes les commandes saisies après une date donnée
     List<Commande> findBySaisieLeAfter(LocalDate date);
+    List<Commande> findByDispensaireCodeAndEnvoyeeLeIsNull(String codeDispensaire);
 }
