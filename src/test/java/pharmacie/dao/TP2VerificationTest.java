@@ -29,9 +29,7 @@ public class TP2VerificationTest {
 
     @Test
     void testToutLeTP2() {
-        // ===================================================================================
-        // 1. TEST DE INTEGRIDAD: No se puede eliminar una categoría que tiene medicamentos
-        // ===================================================================================
+        
         
         Categorie c = new Categorie(); 
         c.setLibelle("Categoria Protegida"); 
@@ -42,23 +40,18 @@ public class TP2VerificationTest {
         m.setCategorie(c); 
         entityManager.persistAndFlush(m);
         
-        // Limpiamos la memoria para probar el borrado real en la BD
+       
         entityManager.clear(); 
 
-        // Recuperamos la categoría fresca
         Categorie cToDelete = categorieRepository.findById(c.getCode()).orElseThrow();
 
-        // Verificamos que lance excepción al intentar borrar.
-        // Usamos Exception.class para atrapar tanto violaciones de integridad (Spring) como de restricción (Hibernate/DB)
+        
         assertThrows(Exception.class, () -> {
             categorieRepository.delete(cToDelete);
             categorieRepository.flush();
         });
 
-        // ===================================================================================
-        // 2. TEST DE INTEGRIDAD: Al eliminar un Dispensario, se eliminan sus pedidos (Cascade)
-        // ===================================================================================
-        
+       
         entityManager.clear();
 
         Dispensaire d = new Dispensaire(); 
@@ -73,25 +66,14 @@ public class TP2VerificationTest {
         
         Integer cmdId = cmd.getNumero();
         
-        // --- CORRECCIÓN CRÍTICA ---
-        // Recargamos 'd' desde la BD para que Hibernate sepa que tiene un pedido 'cmd' asociado.
-        // Si no hacemos esto, la lista d.getCommandes() está vacía en memoria y el Cascade Delete no se dispara.
+        
         entityManager.refresh(d);
         
-        // Acción: Borrar el dispensario
         dispensaireRepository.delete(d); 
-        dispensaireRepository.flush(); // Ahora sí funcionará porque borrará también el pedido
-        
-        // Verificación: El pedido debe haber desaparecido
+        dispensaireRepository.flush(); 
         assertThat(commandeRepository.findById(cmdId)).isEmpty(); 
 
-        // ===================================================================================
-        // 3. TEST DE REQUÊTES (Consultas personalizadas)
-        // ===================================================================================
-        
-        entityManager.clear(); // Limpieza para la nueva sección
-
-        // --- Paso 3.1: Crear y guardar datos maestros ---
+        entityManager.clear(); 
         
         Categorie c2 = new Categorie(); 
         c2.setLibelle("Categoria Queries"); 
@@ -101,8 +83,6 @@ public class TP2VerificationTest {
         d2.setCode("REQ"); 
         d2.setNom("Dispensario Consultas"); 
         d2 = entityManager.persistAndFlush(d2);
-
-        // --- Paso 3.2: Crear y guardar Medicamentos ---
         
         Medicament dispo = new Medicament(); 
         dispo.setNom("Paracetamol"); 
